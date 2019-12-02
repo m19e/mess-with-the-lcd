@@ -1,7 +1,15 @@
 <html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
+<head>
+    <meta charset="utf-8">
+    <!-- viewport meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
+    <title>液晶をみょんみょんするな!</title>
+</head>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="800">
+		   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="800">
 			  <defs>
 			    <filter id="goo">
 			      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
@@ -10,55 +18,26 @@
 			    </filter>
 			  </defs>
 			</svg>
-
-<div class="page">
-	
-	<div class="page-bg">
-		<p>M</p>
-		<div class="noise"></div>
-	</div>
-	
-	<div class="lines">
-		<div class="line1"></div>
-		<div class="line2"></div>
-		<div class="line3"></div>
-		<div class="line4"></div>
-		<div class="line5"></div>
-	</div>
-	
-	<div class="container">
-		<div class="child">
-			<div class="content">
-				<div>
-				<div id="button" class="HoverButton">
-					<div class="bg"></div>
-					<h1>Hover Me</h1>
-				</div>
-				</div>
+	<div class="container-fluid">
+	<div id="cursor" class="Cursor"></div>
+		<header class="sticky-top"></header>
+		<main>
+			<div class="row" style="height:80vh;">
+			<div class="col-4">
 			</div>
-		</div>
+			<div class="col-8">
+			<div class="d-flex align-items-center" style="height:100%;">
+				<h1 class="text-center" style="width:100%;">Welcome</h1>
+			</div>
+			</div>
+			</div>
+		</main>
+		<footer class="sticky-bottom">
+			<div class="float-right d-flex align-items-center" style="height:100%;">
+				<small class="m-5" style="color:white;">by <a href="https://twitter.com/Versas_me">@Versas_me</a></small>
+			</div>
+		</footer>
 	</div>
-	
-	<div class="images">
-		<img src="https://foo-exp.s3.amazonaws.com/morph_mouse/img_big.png" class="big" id="bigImg">
-		<img src="https://foo-exp.s3.amazonaws.com/morph_mouse/img_small.png" class="small" id="smallImg">
-	</div>
-	
-	<div class="stamp">
-		<div class="circle">
-			<p id="circle-content">EXPERIMENTS . EXPERIMENTS .</p>
-		</div>
-		<p>2018</p>
-	</div>
-	
-	<div class="design">
-		<p>Best viewed on Chrome</p>
-		<a href="https://dribbble.com/eaamst" target="blank">Designed by: Eder Anaya</a>
-	</div>
-	
-</div>
-<div id="cursor" class="Cursor">
-</div>
 </body>
 </html>
 
@@ -74,56 +53,6 @@ let mousePosition = { x: 0, y: 0 };
 let dots = [];
 let timeoutID;
 let idle = false;
-let hoverButton;
-let hoverTL;
-
-class HoverButton {
-  constructor(id) {_defineProperty(this, "onMouseEnter",
-    () => {
-      this.hoverInAnim();
-    });_defineProperty(this, "hoverInAnim",
-
-    () => {
-      if (!this.hovered) {
-        this.hovered = true;
-        this.animatingHover = true;
-        this.forceOut = false;
-        TweenMax.fromTo(
-        this.bg,
-        this.timing,
-        { x: "-112%" },
-        {
-          x: "-12%",
-          ease: Power3.easeOut,
-          onComplete: () => {
-            this.animatingHover = false;
-            if (this.forceOut) {
-              this.foceOut = false;
-              this.hoverOutAnim();
-            }
-          } });
-
-
-      }
-    });_defineProperty(this, "onMouseLeave",
-
-    () => {
-      if (!this.animatingHover) {
-        this.hoverOutAnim();
-      } else {
-        this.forceOut = true;
-      }
-    });_defineProperty(this, "hoverOutAnim",
-
-    () => {
-      this.hovered = false;
-      TweenMax.to(this.bg, this.timing, {
-        x: "100%",
-        ease: Power3.easeOut,
-        onComplete: () => {
-        } });
-
-    });this.hovered = false;this.animatingHover = false;this.forceOut = false;this.timing = 0.65;this.el = document.getElementById(id);this.bg = this.el.getElementsByClassName("bg")[0];this.el.addEventListener("mouseenter", this.onMouseEnter);this.el.addEventListener("mouseleave", this.onMouseLeave);}}
 
 
 class Dot {
@@ -160,36 +89,18 @@ class Dot {
   }}
 
 
-class Circle {
-  constructor(id) {
-    const el = document.getElementById(id);
-    const parent = el.parentElement;
-    parent.removeChild(el);
-    const chars = el.innerText.split("");
-    chars.push(" ");
-    for (let i = 0; i < chars.length; i++) {
-      const span = document.createElement("span");
-      span.innerText = chars[i];
-      span.className = `char${i + 1}`;
-      parent.appendChild(span);
-    }
-  }}
-
 
 function init() {
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("touchmove", onTouchMove);
-  hoverButton = new HoverButton("button");
-  // eslint-disable-next-line no-new
-  new Circle("circle-content");
   lastFrame += new Date();
   buildDots();
   render();
 }
 
-/*function limit(value, min, max) {
+function limit(value, min, max) {
       return Math.min(Math.max(min, value), max);
-  }*/
+}
 
 function startIdleTimer() {
   timeoutID = setTimeout(goInactive, idleTimeout);
@@ -256,10 +167,6 @@ init();
 </script>
 
 <style>
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 body,
 html {
   cursor: none;
@@ -272,116 +179,35 @@ html {
 svg {
   display: none;
 }
-.page {
-  width: 100%;
-  height: 100%;
-  background-color: #e0dad5;
-  display: block;
-}
-.page-bg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  position: absolute;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background-color: #e0dad5;
-}
-.page-bg p {
-  font-family: 'Asul', sans-serif;
-  color: #dbd6d1;
-  opacity: 0.8;
-  font-size: 85vmin;
+
+.container-fluid {
+  padding: 0;
   margin: 0;
-  text-align: center;
-  line-height: 100vh;
-}
-.noise {
-  background-image: url("https://foo-exp.s3.amazonaws.com/morph_mouse/noise_pattern.png");
-  background-size: 200px 200px;
-  background-repeat: repeat;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  mix-blend-mode: hard-light;
-}
-.container {
-  width: 100%;
-  height: 100%;
-  display: table;
   z-index: 100;
 }
-.child {
-  display: table-row;
+
+header,
+footer {
+	height: 10vh;
+	background-color: darkblue;
 }
-.content {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
+
+main {
+	height: 80vh;
+	background-color: dodgerblue;
 }
-.HoverButton {
-  position: relative;
-  display: inline-block;
-  z-index: 20;
-  padding: 0 2%;
-  overflow: hidden;
-}
-.HoverButton:after {
-  content: "01";
-  display: block;
-  position: absolute;
-  color: #ee3d3d;
-  top: 5%;
-  right: 3%;
-  mix-blend-mode: difference;
-  font-family: 'Asul', sans-serif;
-  font-size: 1.2vmax;
-  font-weight: bold;
-}
-.HoverButton .bg {
-  pointer-events: none;
-  position: absolute;
-  background-color: #ee3d3d;
-  height: 100%;
-  width: 125%;
-  display: block;
-  -webkit-transform: translateX(-112%) skew(-10deg);
-          transform: translateX(-112%) skew(-10deg);
-}
+
 h1 {
-  color: #ee3d3d;
-  position: relative;
-  font-weight: normal;
-  font-family: 'Asul', sans-serif;
-  z-index: 1;
-  margin: 0;
-  font-size: 11vmax;
-  mix-blend-mode: difference;
+	color: white;
 }
-.images {
-  position: absolute;
-  left: 50%;
-  top: 64vh;
-  -webkit-transform: translate(-50%, 0);
-          transform: translate(-50%, 0);
-  z-index: 10;
-  pointer-events: none;
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+	color: white;
 }
-.images .big {
-  width: 36vmax;
-}
-.images .small {
-  width: 27vmax;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-}
+
 .Cursor {
   pointer-events: none;
   position: fixed;
@@ -389,12 +215,12 @@ h1 {
   border-radius: 0;
   -webkit-transform-origin: center center;
           transform-origin: center center;
-  mix-blend-mode: difference;
+  /* mix-blend-mode: difference; */
   top: 0;
   left: 0;
   z-index: 1000;
-  -ms-filter: blur(10px);
-      filter: blur(10px);
+  -ms-filter: blur(16px);
+      filter: blur(16px);
   /* -webkit-filter: url("#goo"); */
   /*         filter: url("#goo"); */
 }
@@ -404,220 +230,11 @@ h1 {
   width: 26px;
   height: 26px;
   border-radius: 20px;
-  background-color: #fff;
+  background-color: black;
   -webkit-transform-origin: center center;
           transform-origin: center center;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
-}
-.stamp {
-  position: absolute;
-  right: 6vmax;
-  top: 6vmax;
-  z-index: 10;
-}
-.stamp p {
-  color: #ee3d3d;
-  font-size: 2vmax;
-  font-family: 'Asul', sans-serif;
-  margin: 0;
-}
-.stamp .circle {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  display: block;
-  left: 50%;
-  top: 50%;
-  background-color: transparent;
-  -webkit-animation: rotating 9.5s linear infinite;
-          animation: rotating 9.5s linear infinite;
-}
-.stamp .circle span {
-  font-family: 'Rubik', sans-serif;
-  font-weight: bold;
-  font-size: 0.8vmax;
-  color: #ee3d3d;
-  height: 5vmax;
-  position: absolute;
-  display: inline-block;
-  left: 0;
-  bottom: 0;
-  -webkit-transform-origin: bottom center;
-          transform-origin: bottom center;
-}
-.char1 {
-  -webkit-transform: rotate(13deg);
-          transform: rotate(13deg);
-}
-.char2 {
-  -webkit-transform: rotate(26deg);
-          transform: rotate(26deg);
-}
-.char3 {
-  -webkit-transform: rotate(39deg);
-          transform: rotate(39deg);
-}
-.char4 {
-  -webkit-transform: rotate(52deg);
-          transform: rotate(52deg);
-}
-.char5 {
-  -webkit-transform: rotate(65deg);
-          transform: rotate(65deg);
-}
-.char6 {
-  -webkit-transform: rotate(78deg);
-          transform: rotate(78deg);
-}
-.char7 {
-  -webkit-transform: rotate(91deg);
-          transform: rotate(91deg);
-}
-.char8 {
-  -webkit-transform: rotate(104deg);
-          transform: rotate(104deg);
-}
-.char9 {
-  -webkit-transform: rotate(117deg);
-          transform: rotate(117deg);
-}
-.char10 {
-  -webkit-transform: rotate(130deg);
-          transform: rotate(130deg);
-}
-.char11 {
-  -webkit-transform: rotate(143deg);
-          transform: rotate(143deg);
-}
-.char12 {
-  -webkit-transform: rotate(156deg);
-          transform: rotate(156deg);
-}
-.char13 {
-  -webkit-transform: rotate(169deg);
-          transform: rotate(169deg);
-}
-.char14 {
-  -webkit-transform: rotate(182deg);
-          transform: rotate(182deg);
-}
-.char15 {
-  -webkit-transform: rotate(195deg);
-          transform: rotate(195deg);
-}
-.char16 {
-  -webkit-transform: rotate(208deg);
-          transform: rotate(208deg);
-}
-.char17 {
-  -webkit-transform: rotate(221deg);
-          transform: rotate(221deg);
-}
-.char18 {
-  -webkit-transform: rotate(234deg);
-          transform: rotate(234deg);
-}
-.char19 {
-  -webkit-transform: rotate(247deg);
-          transform: rotate(247deg);
-}
-.char20 {
-  -webkit-transform: rotate(260deg);
-          transform: rotate(260deg);
-}
-.char21 {
-  -webkit-transform: rotate(273deg);
-          transform: rotate(273deg);
-}
-.char22 {
-  -webkit-transform: rotate(286deg);
-          transform: rotate(286deg);
-}
-.char23 {
-  -webkit-transform: rotate(299deg);
-          transform: rotate(299deg);
-}
-.char24 {
-  -webkit-transform: rotate(312deg);
-          transform: rotate(312deg);
-}
-.char25 {
-  -webkit-transform: rotate(325deg);
-          transform: rotate(325deg);
-}
-.char26 {
-  -webkit-transform: rotate(338deg);
-          transform: rotate(338deg);
-}
-.char27 {
-  -webkit-transform: rotate(351deg);
-          transform: rotate(351deg);
-}
-.char28 {
-  -webkit-transform: rotate(364deg);
-          transform: rotate(364deg);
-}
-.line,
-.line-vertical,
-.line-horizontal,
-.lines .line1,
-.lines .line2,
-.lines .line3,
-.lines .line4,
-.lines .line5 {
-  position: absolute;
-  background-color: #ede8e5;
-}
-.line-vertical,
-.lines .line3,
-.lines .line4,
-.lines .line5 {
-  width: 2px;
-  height: 100%;
-  top: 0;
-}
-.line-horizontal,
-.lines .line1,
-.lines .line2 {
-  width: 100%;
-  height: 2px;
-  left: 0;
-}
-.lines {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  z-index: 2;
-}
-.lines .line1 {
-  top: 36vh;
-}
-.lines .line2 {
-  top: 64vh;
-}
-.lines .line3 {
-  left: 22vw;
-}
-.lines .line4 {
-  left: 78vw;
-}
-.lines .line5 {
-  left: 50vw;
-}
-.design {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  z-index: 5;
-  color: #000;
-  font-family: 'Work Sans', sans-serif;
-  font-size: 10px;
-}
-.design a {
-  color: #000;
 }
 @-webkit-keyframes rotating {
   from {
@@ -639,5 +256,4 @@ h1 {
             transform: rotate(360deg);
   }
 }
-
 </style>
