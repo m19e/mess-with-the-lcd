@@ -1,0 +1,259 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- viewport meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
+    <title>液晶をみょんみょんするな!</title>
+</head>
+<body>
+		   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="800">
+			  <defs>
+			    <filter id="goo">
+			      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+			      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -15" result="goo" />
+			      <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+			    </filter>
+			  </defs>
+			</svg>
+	<div class="container-fluid">
+	<div id="cursor" class="Cursor"></div>
+		<header class="sticky-top"></header>
+		<main>
+			<div class="row" style="height:80vh;">
+			<div class="col-4">
+			</div>
+			<div class="col-8">
+			<div class="d-flex align-items-center" style="height:100%;">
+				<h1 class="text-center" style="width:100%;">Welcome</h1>
+			</div>
+			</div>
+			</div>
+		</main>
+		<footer class="sticky-bottom">
+			<div class="float-right d-flex align-items-center" style="height:100%;">
+				<small class="m-5" style="color:white;">by <a href="https://twitter.com/Versas_me">@Versas_me</a></small>
+			</div>
+		</footer>
+	</div>
+</body>
+</html>
+
+<script>
+
+function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}const cursor = document.getElementById("cursor");
+const amount = 20;
+const sineDots = Math.floor(amount * 0.3);
+const width = 26;
+const idleTimeout = 150;
+let lastFrame = 0;
+let mousePosition = { x: 0, y: 0 };
+let dots = [];
+let timeoutID;
+let idle = false;
+
+
+class Dot {
+  constructor(index = 0) {
+    this.index = index;
+    this.anglespeed = 0.05;
+    this.x = 0;
+    this.y = 0;
+    this.scale = 1 - 0.05 * index;
+    this.range = width / 2 - width / 2 * this.scale + 2;
+    this.limit = width * 0.75 * this.scale;
+    this.element = document.createElement("span");
+    TweenMax.set(this.element, { scale: this.scale });
+    cursor.appendChild(this.element);
+  }
+
+  lock() {
+    this.lockX = this.x;
+    this.lockY = this.y;
+    this.angleX = Math.PI * 2 * Math.random();
+    this.angleY = Math.PI * 2 * Math.random();
+  }
+
+  draw(delta) {
+    if (!idle || this.index <= sineDots) {
+      TweenMax.set(this.element, { x: this.x, y: this.y });
+    } else {
+      this.angleX += this.anglespeed;
+      this.angleY += this.anglespeed;
+      this.y = this.lockY + Math.sin(this.angleY) * this.range;
+      this.x = this.lockX + Math.sin(this.angleX) * this.range;
+      TweenMax.set(this.element, { x: this.x, y: this.y });
+    }
+  }}
+
+
+
+function init() {
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("touchmove", onTouchMove);
+  lastFrame += new Date();
+  buildDots();
+  render();
+}
+
+function limit(value, min, max) {
+      return Math.min(Math.max(min, value), max);
+}
+
+function startIdleTimer() {
+  timeoutID = setTimeout(goInactive, idleTimeout);
+  idle = false;
+}
+
+function resetIdleTimer() {
+  clearTimeout(timeoutID);
+  startIdleTimer();
+}
+
+function goInactive() {
+  idle = true;
+  for (let dot of dots) {
+    dot.lock();
+  }
+}
+
+function buildDots() {
+  for (let i = 0; i < amount; i++) {
+    let dot = new Dot(i);
+    dots.push(dot);
+  }
+}
+
+const onMouseMove = event => {
+  mousePosition.x = event.clientX - width / 2;
+  mousePosition.y = event.clientY - width / 2;
+  resetIdleTimer();
+};
+
+const onTouchMove = () => {
+  mousePosition.x = event.touches[0].clientX - width / 2;
+  mousePosition.y = event.touches[0].clientY - width / 2;
+  resetIdleTimer();
+};
+
+const render = timestamp => {
+  const delta = timestamp - lastFrame;
+  positionCursor(delta);
+  lastFrame = timestamp;
+  requestAnimationFrame(render);
+};
+
+const positionCursor = delta => {
+  let x = mousePosition.x;
+  let y = mousePosition.y;
+  dots.forEach((dot, index, dots) => {
+    let nextDot = dots[index + 1] || dots[0];
+    dot.x = x;
+    dot.y = y;
+    dot.draw(delta);
+    if (!idle || index <= sineDots) {
+      const dx = (nextDot.x - dot.x) * 0.35;
+      const dy = (nextDot.y - dot.y) * 0.35;
+      x += dx;
+      y += dy;
+    }
+  });
+};
+
+init();
+
+</script>
+
+<style>
+body,
+html {
+  cursor: none;
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background-color: #e0dad5;
+  overflow: hidden;
+}
+svg {
+  display: none;
+}
+
+.container-fluid {
+  padding: 0;
+  margin: 0;
+  z-index: 100;
+}
+
+header,
+footer {
+	height: 10vh;
+	background-color: darkblue;
+}
+
+main {
+	height: 80vh;
+	background-color: dodgerblue;
+}
+
+h1 {
+	color: white;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+	color: white;
+}
+
+.Cursor {
+  pointer-events: none;
+  position: fixed;
+  display: block;
+  border-radius: 0;
+  -webkit-transform-origin: center center;
+          transform-origin: center center;
+  /* mix-blend-mode: difference; */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  -ms-filter: blur(16px);
+      filter: blur(16px);
+  /* -webkit-filter: url("#goo"); */
+  /*         filter: url("#goo"); */
+}
+.Cursor span {
+  position: absolute;
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 20px;
+  background-color: black;
+  -webkit-transform-origin: center center;
+          transform-origin: center center;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+@-webkit-keyframes rotating {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+@keyframes rotating {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+</style>
